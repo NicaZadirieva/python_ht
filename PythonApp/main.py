@@ -1,17 +1,18 @@
-"""Демо модуль для курса"""
+class Task:
+    """Задача"""
+    done: bool = False
+    title: str
 
-class User:
-    """Пользователь системы"""
-    email: str
-    name: str
-    age: int
+    def get_info(self):
+        """Получение данных задачи"""
+        print("Задача")
+    
+    def set_info(self, text: str):
+        """Установка title"""
+        self.title = text
 
-print(type(User))
-userMaria = User()
+task = Task()
+task.get_info()
+task.set_info("Сделать лекцию")
 
-print(userMaria)
-
-userAnton = User()
-print(userAnton)
-
-userAnton.email = "a@a.ru"
+print(task.title)
