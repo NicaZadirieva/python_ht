@@ -1,16 +1,16 @@
-class Note:
-    title: str
-    description: str
+from datetime import date
 
-    def __init__(self, title: str, description: str = ""):
+class Book:
+    """Книга"""
+    def __init__(self, title: str, year: int):
         self.title = title
-        self.description = description
-        print("Создана заметка")
+        self.year = year
 
-note = Note("Это title", "Это description")
-print(note.title)
-print(note.description)
+    @staticmethod
+    def years_since(year: int):
+        """Сколько прошло лет после публикации любой книги"""
+        return date.today().year - year
 
-noteOutDesc = Note("Это title для noteOutDesc")
-print(noteOutDesc.title)
-print(noteOutDesc.description)
+
+book = Book("Властелин колец", 1985)
+print(Book.years_since(book.year))
