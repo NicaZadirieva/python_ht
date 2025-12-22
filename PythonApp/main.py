@@ -1,16 +1,17 @@
-from datetime import date
+class User:
+    """Пользователь"""
+    users = [] # свойство класса
 
-class Book:
-    """Книга"""
-    def __init__(self, title: str, year: int):
-        self.title = title
-        self.year = year
+    def __init__(self, name):
+        self.name = name
+        User.users.append(self)
 
-    @staticmethod
-    def years_since(year: int):
-        """Сколько прошло лет после публикации любой книги"""
-        return date.today().year - year
+    @classmethod
+    def total_users(cls):
+        """Число пользователей"""
+        return len(cls.users)
 
+vasya = User("Вася")
+kate = User("Катя")
 
-book = Book("Властелин колец", 1985)
-print(Book.years_since(book.year))
+print(User.total_users())
