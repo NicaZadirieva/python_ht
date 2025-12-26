@@ -1,12 +1,19 @@
-class Rectangle:
-    def __init__(self, width: float, height: float):
-        self.width = width
-        self.height = height
+from dataclasses import dataclass
+from datetime import datetime
 
-    @property
-    def area(self):
-        """Площадь"""
-        return self.width * self.height
+@dataclass()
+class Task:
+    title: str
+    priority: int = 3
+    done: bool = False
+    created_at: datetime | None = None  # Python 3.10+ (иначе: Optional[datetime])
 
-rect = Rectangle(10, 5)
-print(rect.area)
+    def __post_init__(self):
+        if self.created_at is None:
+            self.created_at = datetime.now()
+
+task = Task("Сделать лекцию")
+print(task)
+
+task2 = Task("Сделать лекцию")
+print(task == task2)
