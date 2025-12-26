@@ -206,3 +206,6 @@ marimo/_static/
 marimo/_lsp/
 __marimo__/
 PythonApp/.vs
+1-oop/.vs
+*.sln
+1-oop/1-oop.pyproj
