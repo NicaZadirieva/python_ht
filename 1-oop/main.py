@@ -15,6 +15,7 @@ class BankAccount:
     def __post_init__(self):
         if self.balance < 0:
             raise ValueError("Баланс должен быть положительным числом")
+        global accounts_created
         accounts_created += 1
 
 
