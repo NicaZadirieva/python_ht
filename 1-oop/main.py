@@ -27,6 +27,8 @@ class BankAccount:
 
     def withdraw(self, amount: float | int):
         """Снятие денег со счёта. Нельзя уйти в минус."""
+        if amount < 0:
+            raise ValueError("Баланс можно только уменьшить")
         if self.balance - amount < 0:
             raise ValueError("Недостаточно средств")
         self.balance -= amount
