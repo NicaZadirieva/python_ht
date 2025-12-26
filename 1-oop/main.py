@@ -1,7 +1,8 @@
 ﻿"""Дз 1 по теме ООП"""
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
+accounts_created = 0
 
 @dataclass
 class BankAccount:
@@ -10,12 +11,11 @@ class BankAccount:
     accountId: str | int
     balance: float | int = 0
 
-    accounts_created: int = field(init = False, default = 0)
 
     def __post_init__(self):
         if self.balance < 0:
             raise ValueError("Баланс должен быть положительным числом")
-        BankAccount.accounts_created += 1
+        accounts_created += 1
 
 
     def deposit(self, amount: float | int):
@@ -36,7 +36,7 @@ class BankAccount:
             raise ValueError("Передать деньги можно только банковскому счету")
         if accountSum < 0:
             raise ValueError("Сумма перевода должна быть положительным числом")
-        if self.account < accountSum:
+        if self.balance < accountSum:
             raise ValueError("Недостаточно средств")
         bankAccount.deposit(accountSum)
         self.withdraw(accountSum)
@@ -48,4 +48,4 @@ class BankAccount:
     @classmethod
     def get_accounts_created(cls):
         """Количество созданных счетов"""
-        return cls.accounts_created
+        return accounts_created
