@@ -1,16 +1,13 @@
-def add_repr(cls):
-    def __repr__(self):
-        return f"{cls.__name__}[{self.__dict__}]"
-    cls.__repr__ = __repr__
-    return cls
+def repeat(times: int):
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            for _ in range(times):
+                func(*args, **kwargs)
+        return wrapper
+    return decorator
 
-@add_repr
-class User:
-    def __init__(self, name: str, age: int):
-        self.name = name
-        self.age = age
+@repeat(3)
+def hello():
+    print("hello")
 
-
-# User = decorator(User)
-user = User("Nica", 25)
-print(user)
+hello()
