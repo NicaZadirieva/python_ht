@@ -1,24 +1,12 @@
-import random
+def log_call(func):
+    def wrapper(*args, **kwargs):
+        print(f"Log {func.__qualname__} {args} {kwargs}")
+        return func(*args, **kwargs)
+    return wrapper
 
+class Service:
+    @log_call
+    def process(self, x: float) -> float:
+        return x * 2
 
-def retry(max_times: int):
-    def decorator(func):
-        def wrapper(*args, **kwargs):
-            is_success = True
-            for _ in range(max_times - 1):
-                try:
-                    return func(*args, **kwargs)
-                except:
-                     is_success = False
-            if not is_success:
-                return func(*args, **kwargs)
-        return wrapper
-    return decorator
-
-@retry(7)
-def unstable():
-    if random.random() < 0.7:
-        raise ValueError("Ошибка соединения")
-    print("Успешное соединение")
-
-unstable()
+Service().process(5)
