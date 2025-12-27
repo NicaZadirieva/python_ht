@@ -1,12 +1,12 @@
-def log_decorator(func):
-    def wrapper():
-        print("func starting")
-        func()
-        print("func ended")
+def log(func):
+    def wrapper(*args, **kwargs):
+        print(f"Invoking {func.__name__} с аргументами {args} {kwargs}")
+        result = func(*args, **kwargs)
+        return result
     return wrapper
 
-@log_decorator
-def say_hello():
-    print("Hello")
+@log
+def add(a: float, b: float):
+    return a + b
 
-say_hello()
+print(add(3, 5))
