@@ -1,15 +1,13 @@
-from dataclasses import dataclass, field
-from datetime import datetime
+def say_hello():
+    print("Hello")
 
-@dataclass()
-class Task:
-    title: str
-    priority: int = 3
-    done: bool = False
-    created_at: datetime = field(default_factory=datetime.now, repr=True, compare=False)  
+def log_decorator(func):
+    def wrapper():
+        print("func starting")
+        func()
+        print("func ended")
+    return wrapper
 
-task = Task("Сделать лекцию")
-print(task)
+decorated = log_decorator(say_hello)
 
-task2 = Task("Сделать лекцию")
-print(task == task2)  # Теперь будет True!
+decorated()
