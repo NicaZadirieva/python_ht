@@ -7,15 +7,11 @@ class LimitCalls:
 
     def __call__(self, func):
         @wraps(func)
-        def wrapper(self_obj, *args, **kwargs):
-            attr_name = "count_attr_" + func.__name__
-            current_counter = getattr(self_obj, attr_name, 0)
-            
-            if current_counter >= self.times:
+        def wrapper(*args, **kwargs):
+            if self.times <= 0:
                 raise RuntimeError("Not valid invoking")
-            
-            setattr(self_obj, attr_name, current_counter + 1)
-            return func(self_obj, *args, **kwargs)
+            self.times -= 1
+            return func(*args, **kwargs)
         
         return wrapper
 
