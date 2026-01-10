@@ -1,48 +1,45 @@
-"""Заказ в интернет-магазине"""
+"""Создать два типа хранилищ данных: в памяти (memory storage) и в файле (file storage)."""
+from dataclasses import dataclass
 from typing import Protocol
-class Item:
-    """Продукт"""
-    def __init__(self, name: str, price: float, qty: int):
-        self.name = name
-        self.price = price
-        self.qty = qty
 
-    def subtotal(self):
-        """Цена товара в заказе"""
-        return self.price * self.qty
+class Storage(Protocol):
+    """Протокол для хранилища данных"""
 
-class DiscountPolicy(Protocol):
-    """Протокол скидок"""
-    def discount(self, total: float) -> float: ...
+    def save(self, data: str) -> None: ...
+    def load(self) -> str: ...
 
+@dataclass
+class MemoryStorage(Storage):
+    """Хранит данные в памяти"""
+    storage_data: str = ""
+    def save(self, data: str) -> None:
+        self.storage_data = data
 
-class NoDiscountPolicy(DiscountPolicy):
-    """Политика: без скидки"""
-    def discount(self, total: float) -> float:
-        return 0
-
-class PercentageDiscountPolicy(DiscountPolicy):
-    """Политика: со  скидкой"""
-    def __init__(self, percentage: int):
-        self.__percentage = percentage
-
-    def discount(self, total: float) -> float:
-        return total * (1 - self.__percentage / 100)
+    def load(self) -> str:
+        return self.storage_data
 
 
-class Order:
-    def __init__(self, items: list[Item], policy: DiscountPolicy):
-        self.items = items
-        self.policy = policy
 
-    def total(self):
-        total_price = 0
-        for item in self.items:
-            total_price += item.subtotal()
-        return total_price
+@dataclass
+class FileStorage(Storage):
+    """Хранит данные в файле"""
+    file_name: str
+    def save(self, data: str) -> None:
+        with open(self.file_name, 'w', encoding="utf-8") as file:
+            file.write(data)
 
-    def total_with_discount(self):
-        return self.policy.dicount(self.total())
+    def load(self) -> str:
+        with open(self.file_name, 'r', encoding="utf-8") as file:
+            return file.read()
 
-    def set_policy(self, policy: DiscountPolicy):
-        self.policy = policy
+
+def use_storage(storage: Storage, data: str):
+    storage.save(data)
+    return storage.load()
+
+mem = MemoryStorage()
+file = FileStorage("file.txt")
+
+user_input = input("Введите данные: ")
+print(use_storage(mem, user_input))
+print(use_storage(file, user_input))
