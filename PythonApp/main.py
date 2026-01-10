@@ -1,5 +1,5 @@
 """Заказ в интернет-магазине"""
-
+from typing import Protocol
 class Item:
     """Продукт"""
     def __init__(self, name: str, price: float, qty: int):
@@ -11,24 +11,27 @@ class Item:
         """Цена товара в заказе"""
         return self.price * self.qty
 
-class Policy:
-    pass
+class DiscountPolicy(Protocol):
+    """Протокол скидок"""
+    def discount(self, total: float) -> float: ...
 
-class NoDiscountPolicy(Policy):
+
+class NoDiscountPolicy(DiscountPolicy):
     """Политика: без скидки"""
-    pass
+    def discount(self, total: float) -> float:
+        return 0
 
-class PercentageDiscountPolicy(Policy):
+class PercentageDiscountPolicy(DiscountPolicy):
     """Политика: со  скидкой"""
     def __init__(self, percentage: int):
         self.__percentage = percentage
 
-    def get_percentage(self):
-        return self.__percentage
+    def discount(self, total: float) -> float:
+        return total * (1 - self.__percentage / 100)
 
 
 class Order:
-    def __init__(self, items: list[Item], policy: Policy):
+    def __init__(self, items: list[Item], policy: DiscountPolicy):
         self.items = items
         self.policy = policy
 
@@ -39,12 +42,7 @@ class Order:
         return total_price
 
     def total_with_discount(self):
-        if isinstance(self.policy, NoDiscountPolicy):
-            return self.total()
-        elif isinstance(self.policy, PercentageDiscountPolicy):
-            return self.total() * (1 - self.policy.get_percentage() / 100)
-        else:
-            raise ValueError("Не правильно задана политика цен")
+        return self.policy.dicount(self.total())
 
-    def set_policy(self, policy: Policy):
+    def set_policy(self, policy: DiscountPolicy):
         self.policy = policy
