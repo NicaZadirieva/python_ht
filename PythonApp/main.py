@@ -1,44 +1,50 @@
-class Course:
-    """Базовый класс курса"""
-    def __init__(self, price: int, name: str, duration_ms: int):
-        self.__price = price
+"""Заказ в интернет-магазине"""
+
+class Item:
+    """Продукт"""
+    def __init__(self, name: str, price: float, qty: int):
         self.name = name
-        self.duration_ms = duration_ms
+        self.price = price
+        self.qty = qty
 
-    def get_price(self):
-        """Получение цены"""
-        return self.__price
+    def subtotal(self):
+        """Цена товара в заказе"""
+        return self.price * self.qty
 
-    def print_info(self):
-        """Вывод информации о курсе"""
-        print(f"{self.name}: {self.duration_ms}ms, {self.get_price()}rub")
-
-
-class CreditMixin:
-    """Миксин расчета рассрочки"""
-    price = 0
-    duration_ms = 0
-    def get_credit(self):
-        """Расчет рассрочки"""
-        credit = self.get_price() / self.duration_ms
-        return credit
-
-class AiCourse(Course, CreditMixin):
-    """АИ и тренажеры"""
+class Policy:
     pass
 
-class ProjectCourse(Course, CreditMixin):
-    """Проектный курс"""
-    def __init__(self, price: int, name: str, duration_ms: int, project_name: str):
-        super().__init__(price, name, duration_ms)
-        self.__project_name = project_name
+class NoDiscountPolicy(Policy):
+    """Политика: без скидки"""
+    pass
 
-    def print_info(self):
-        """Вывод информации о курсе"""
-        print(f"{self.name}, {self.__project_name}: {self.duration_ms}ms, {self.get_price()}rub")
+class PercentageDiscountPolicy(Policy):
+    """Политика: со  скидкой"""
+    def __init__(self, percentage: int):
+        self.__percentage = percentage
 
-    def get_project_info(self):
-        """Информация о проекте"""
-        return self.__project_name
+    def get_percentage(self):
+        return self.__percentage
 
 
+class Order:
+    def __init__(self, items: list[Item], policy: Policy):
+        self.items = items
+        self.policy = policy
+
+    def total(self):
+        total_price = 0
+        for item in self.items:
+            total_price += item.subtotal()
+        return total_price
+
+    def total_with_discount(self):
+        if isinstance(self.policy, NoDiscountPolicy):
+            return self.total()
+        elif isinstance(self.policy, PercentageDiscountPolicy):
+            return self.total() * (1 - self.policy.get_percentage() / 100)
+        else:
+            raise ValueError("Не правильно задана политика цен")
+
+    def set_policy(self, policy: Policy):
+        self.policy = policy
