@@ -1,12 +1,18 @@
 """Создать два типа хранилищ данных: в памяти (memory storage) и в файле (file storage)."""
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Protocol
 
-class Storage(Protocol):
+class Storage(ABC):
     """Протокол для хранилища данных"""
 
+    @abstractmethod
     def save(self, data: str) -> None: ...
+
+    @abstractmethod
     def load(self) -> str: ...
+
+    def log(self):
+        print("Сохранено")
 
 @dataclass
 class MemoryStorage(Storage):
