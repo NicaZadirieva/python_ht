@@ -14,14 +14,20 @@ class Course:
         print(f"{self.name}: {self.duration_ms}ms, {self.get_price()}rub")
 
 
-class AiCourse(Course):
-    """АИ и тренажеры"""
+class CreditMixin:
+    """Миксин расчета рассрочки"""
+    price = 0
+    duration_ms = 0
     def get_credit(self):
         """Расчет рассрочки"""
         credit = self.get_price() / self.duration_ms
         return credit
 
-class ProjectCourse(Course):
+class AiCourse(Course, CreditMixin):
+    """АИ и тренажеры"""
+    pass
+
+class ProjectCourse(Course, CreditMixin):
     """Проектный курс"""
     def __init__(self, price: int, name: str, duration_ms: int, project_name: str):
         super().__init__(price, name, duration_ms)
@@ -30,11 +36,6 @@ class ProjectCourse(Course):
     def print_info(self):
         """Вывод информации о курсе"""
         print(f"{self.name}, {self.__project_name}: {self.duration_ms}ms, {self.get_price()}rub")
-
-    def get_credit(self):
-        """Расчет рассрочки"""
-        credit = self.get_price() / self.duration_ms
-        return credit
 
     def get_project_info(self):
         """Информация о проекте"""
