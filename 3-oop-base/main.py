@@ -83,7 +83,7 @@ class Hotel:
 
     def show_all_available_rooms(self, date_to_order: datetime):
         for room in self.available_rooms_for_ordering:
-            if (room.not_available_from > date_to_order > room.not_available_to) or (room.not_available_to is None and room.not_available_from is None):
+            if not (room.not_available_from < date_to_order < room.not_available_to) or (room.not_available_to is None and room.not_available_from is None):
                 print(room)
 
     def show_all_booked_rooms(self):
@@ -109,6 +109,7 @@ class Hotel:
             raise ValueError("Такого номера не существует")
         booked_room = self.bookingService.book_room(old_room, not_available_from, not_available_to)
         self.booked_rooms.append(booked_room)
+        self.available_rooms_for_ordering.remove(old_room)
         return booked_room
 
     def cancel_room(self, room_number: int):
@@ -119,4 +120,5 @@ class Hotel:
             raise ValueError("Такого номера не существует")
         cancelled_room = self.bookingService.cancel_order(old_room)
         self.available_rooms_for_ordering.append(cancelled_room)
+        self.booked_rooms.append(old_room)
         return cancelled_room
