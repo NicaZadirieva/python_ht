@@ -19,7 +19,7 @@ from dataclasses import dataclass
 from datetime import datetime
 @dataclass
 class Room(ABC):
-    __price: float
+    price: float
     not_available_from: datetime = None
     not_available_to: datetime = None
     room_number: int
@@ -49,7 +49,7 @@ class LuxaryRoom(Room):
     """Мультипликатор цены"""
     multiplicator: float
     def get_price(self) -> float:
-        return self.__price * self.multiplicator
+        return self.price * self.multiplicator
 
 
 @dataclass
@@ -57,7 +57,7 @@ class SimpleRoom(Room):
     """Обычный номер"""
 
     def get_price(self) -> float:
-        return self.__price
+        return self.price
 
 
 class Booking:
@@ -81,9 +81,10 @@ class Hotel:
     available_rooms_for_ordering: list[Room] = []
     booked_rooms: list[Room] = []
 
-    def show_all_available_rooms(self):
+    def show_all_available_rooms(self, date_to_order: datetime):
         for room in self.available_rooms_for_ordering:
-            print(room)
+            if room.not_available_from > date_to_order > room.not_available_to:
+                print(room)
 
     def show_all_booked_rooms(self):
         for room in self.booked_rooms:
@@ -94,7 +95,7 @@ class Hotel:
         self.available_rooms_for_ordering.append(room)
         return room
 
-    def __get_room__(storage: list[Room], room_number: int):
+    def __get_room__(self, storage: list[Room], room_number: int):
         for room in storage:
             if room.room_number == room_number:
                 return room
