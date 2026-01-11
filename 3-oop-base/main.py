@@ -83,7 +83,7 @@ class Hotel:
 
     def show_all_available_rooms(self, date_to_order: datetime):
         for room in self.available_rooms_for_ordering:
-            if room.not_available_from > date_to_order > room.not_available_to:
+            if (room.not_available_from > date_to_order > room.not_available_to) or (room.not_available_to is None and room.not_available_from is None):
                 print(room)
 
     def show_all_booked_rooms(self):
