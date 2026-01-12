@@ -1,53 +1,58 @@
-"""Liskov substitution principle"""
-"""Прицнип подстановки Барбары Лисков"""
+"""Interface Segregation Principle"""
 
-"""Объекты дочерних классов должны быть взаимозаменяемы с объектами базовых классов без нарушения работы программы."""
+"""
+Программисты не должны заставлять классы имплементировать методы, которые им не требуются. 
+Интерфейсы должны быть узкими и специализированными, чтобы избежать ненужной функциональности.
+"""
 
-from dataclasses import dataclass
+#class Printer:
+#    def print_doc(self, doc: str):
+#         pass
 
-@dataclass
-class Payment():
-    total_amount: int = 0
+#     def scan_doc(self, doc: str):
+#         pass
 
-    def pay(self, amount: int):
-        if amount > self.total_amount:
-            raise ValueError("Значение amount > суммы в кошельке")
-        self.total_amount -= amount
-        return self.total_amount
+#     def fax_doc(self, doc: str):
+#         pass
 
+# class OldPrinter(Printer):
+#     def print_doc(self, doc: str):
+#         pass
 
-@dataclass
-class BonusPayment(Payment):
-    bonuses: int = 0
-    def pay(self, amount: int):
-        if amount + self.bonuses > self.total_amount:
-            raise ValueError("Значение amount + bonuses > суммы в кошельке")
-        self.total_amount -= amount + self.bonuses
-        return self.total_amount
+#     def scan_doc(self, doc: str):
+#         raise NotImplementedError("Не могу")
 
+#     def fax_doc(self, doc: str):
+#         raise NotImplementedError("Не могу")
 
-@dataclass
-class InstallmentPayment(Payment):
-    n: int = 1
-    def pay(self, amount: int):
-        if self.n == 0:
-            print("Рассрочка оплачена")
-            return self.total_amount
+from abc import ABC, abstractmethod
 
-        amount_with_n = amount / self.n
-        if amount_with_n > self.total_amount:
-            raise ValueError("Значение amount > суммы в кошельке")
-
-        self.total_amount -= amount_with_n
-        self.n -= 1
-
-        return self.total_amount
+class Printable(ABC):
+    @abstractmethod
+    def print_doc(self, doc: str):
+        pass
 
 
-payment = Payment(100)
-bonusPayment = BonusPayment(100, 11)
-installmentPayment = InstallmentPayment(100, 10)
+class Scannable(ABC):
+    @abstractmethod
+    def scan_doc(self, doc: str):
+         pass
 
-print(f"Simple payment: {payment.pay(99)}")
-print(f"Bonus payment: {bonusPayment.pay(1)}")
-print(f"Install payment: {installmentPayment.pay(99)}")
+class Faxable(ABC):
+    @abstractmethod
+    def fax_doc(self, doc: str):
+         pass
+
+class ModernPrinter(Printable, Scannable, Faxable):
+    def print_doc(self, doc: str):
+         pass
+
+    def scan_doc(self, doc: str):
+         pass
+
+    def fax_doc(self, doc: str):
+         pass
+
+class OldPrinter(Printable):
+    def print_doc(self, doc: str):
+         pass
