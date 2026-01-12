@@ -5,54 +5,58 @@
 Интерфейсы должны быть узкими и специализированными, чтобы избежать ненужной функциональности.
 """
 
-#class Printer:
-#    def print_doc(self, doc: str):
+# class PaymentProcessor:
+#     def pay(self, amount: float):
 #         pass
 
-#     def scan_doc(self, doc: str):
+#     def refund(self, amount: float):
 #         pass
 
-#     def fax_doc(self, doc: str):
+#     def tokenize_card(self, card_number: str):
 #         pass
 
-# class OldPrinter(Printer):
-#     def print_doc(self, doc: str):
+#     def check_balance(self):
 #         pass
-
-#     def scan_doc(self, doc: str):
-#         raise NotImplementedError("Не могу")
-
-#     def fax_doc(self, doc: str):
-#         raise NotImplementedError("Не могу")
 
 from abc import ABC, abstractmethod
 
-class Printable(ABC):
+class Payable(ABC):
     @abstractmethod
-    def print_doc(self, doc: str):
+    def pay(self, amount: float):
         pass
 
-
-class Scannable(ABC):
+class Refundable(ABC):
     @abstractmethod
-    def scan_doc(self, doc: str):
-         pass
+    def refund(self, amount: float):
+        pass
 
-class Faxable(ABC):
+class Tokenizable(ABC):
     @abstractmethod
-    def fax_doc(self, doc: str):
+    def tokenize_card(self, card_number: str):
          pass
 
-class ModernPrinter(Printable, Scannable, Faxable):
-    def print_doc(self, doc: str):
+class BalanceCheckable(ABC):
+    @abstractmethod
+    def check_balance(self):
          pass
 
-    def scan_doc(self, doc: str):
+
+
+class MasterCard(Payable, Tokenizable):
+    def pay(self, amount: float):
+        pass
+   
+    def tokenize_card(self, card_number: str):
+         pass
+   
+class PayPal(Payable, BalanceCheckable):
+    def pay(self, amount: float):
+        pass
+    def check_balance(self):
          pass
 
-    def fax_doc(self, doc: str):
-         pass
-
-class OldPrinter(Printable):
-    def print_doc(self, doc: str):
-         pass
+class Kiwi(Payable, Refundable):
+    def pay(self, amount: float):
+        pass
+    def refund(self, amount: float):
+        pass
