@@ -6,15 +6,24 @@
 """
 
 from dataclasses import dataclass
+from abc import ABC, abstractmethod
 
+class Logger(ABC):
+    @abstractmethod
+    def log(self, message: str):
+       pass
 
-class FileLogger:
+class FileLogger(Logger):
     def log(self, message: str):
         print(f"Запись в файл: {message}")
 
+class ConsoleLogger(Logger):
+    def log(self, message: str):
+        print(f"Запись в консоль: {message}")
+
 @dataclass
 class UserService:
-    logger = FileLogger() # нарушение DIP
+    logger: Logger
 
     def create_user(self, name: str):
         self.logger.log(f"Создан аккаунт {name}")
