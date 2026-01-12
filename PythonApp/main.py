@@ -1,62 +1,20 @@
-"""Interface Segregation Principle"""
+"""Dependency Inversion Principle"""
 
 """
-Программисты не должны заставлять классы имплементировать методы, которые им не требуются. 
-Интерфейсы должны быть узкими и специализированными, чтобы избежать ненужной функциональности.
+Модули верхних уровней не должны напрямую зависеть от модулей нижних уровней.
+Оба типа модулей должны зависеть от абстракций, а не абстракции от деталей.
 """
 
-# class PaymentProcessor:
-#     def pay(self, amount: float):
-#         pass
-
-#     def refund(self, amount: float):
-#         pass
-
-#     def tokenize_card(self, card_number: str):
-#         pass
-
-#     def check_balance(self):
-#         pass
-
-from abc import ABC, abstractmethod
-
-class Payable(ABC):
-    @abstractmethod
-    def pay(self, amount: float):
-        pass
-
-class Refundable(ABC):
-    @abstractmethod
-    def refund(self, amount: float):
-        pass
-
-class Tokenizable(ABC):
-    @abstractmethod
-    def tokenize_card(self, card_number: str):
-         pass
-
-class BalanceCheckable(ABC):
-    @abstractmethod
-    def check_balance(self):
-         pass
+from dataclasses import dataclass
 
 
+class FileLogger:
+    def log(self, message: str):
+        print(f"Запись в файл: {message}")
 
-class MasterCard(Payable, Tokenizable):
-    def pay(self, amount: float):
-        pass
-   
-    def tokenize_card(self, card_number: str):
-         pass
-   
-class PayPal(Payable, BalanceCheckable):
-    def pay(self, amount: float):
-        pass
-    def check_balance(self):
-         pass
+@dataclass
+class UserService:
+    logger = FileLogger() # нарушение DIP
 
-class Kiwi(Payable, Refundable):
-    def pay(self, amount: float):
-        pass
-    def refund(self, amount: float):
-        pass
+    def create_user(self, name: str):
+        self.logger.log(f"Создан аккаунт {name}")
