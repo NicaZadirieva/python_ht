@@ -27,7 +27,7 @@
 Печать отчета с помощью созданного метода.
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 @dataclass
 class Student:
@@ -35,9 +35,10 @@ class Student:
     name: str
     score: float
 
+@dataclass
 class StudentStorage:
     """Хранение списка студентов"""
-    students: list[Student] = []
+    students: list[Student] = field(default_factory=list)
 
     def add_student(self, student: Student) -> Student:
         """Добавление нового студента"""
@@ -62,6 +63,14 @@ class StudentStatistics:
                 best_student = student
         return best_student
 
+    def get_average_score(self):
+        """Метод для нахождения среднего балла"""
+        students = self.studentStorage.get_all_students()
+        sum_score = 0
+        for student in students:
+            sum_score += student.score
+        return sum_score / len(students) if len(students) > 0 else 0 
+
 
 @dataclass
 class StudentReportService:
@@ -77,6 +86,9 @@ class StudentReportService:
         students = self.studentStorage.get_all_students()
         for student in students:
             print(f"Student: {student.name} {student.score}")
+
+    def generate_average_score(self) -> None:
+        print(f"Average score: {self.studentStatistics.get_average_score()}")
 
 # пример использования
 studentStorage = StudentStorage()
@@ -99,3 +111,4 @@ studentStorage.add_student(
 
 studentReportService.generate_all()
 studentReportService.generate_best()
+studentReportService.generate_average_score()
