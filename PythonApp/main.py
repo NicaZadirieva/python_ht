@@ -24,7 +24,7 @@ class PremiumUser(User):
 # нарушение LSP.
 class BannedUser(User):
     def add_bonus(self, amount: int):
-        raise Exception("Юзер забанен")
+        print(f"Пользователь {self.name} не может получить бонусы")
 
 user = User("Вася")
 
