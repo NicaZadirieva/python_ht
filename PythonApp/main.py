@@ -57,10 +57,7 @@ class StudentStatistics:
     def get_best_student(self):
         """Метод для нахождения студента с наилучшей оценкой"""
         students = self.studentStorage.get_all_students()
-        best_student = students[0]
-        for student in students:
-            if student.score > best_student.score:
-                best_student = student
+        best_student = max(students, key=lambda s: s.score)
         return best_student
 
     def get_average_score(self):
@@ -73,27 +70,36 @@ class StudentStatistics:
 
 
 @dataclass
-class StudentReportService:
+class StudentReportPrinter:
     """Печать отчета"""
     studentStatistics: StudentStatistics
     studentStorage: StudentStorage
 
-    def generate_best(self) -> None:
+    def __generate_best__(self) -> None:
+        """Печать лучшего студента"""
         best_student = self.studentStatistics.get_best_student()
         print(f"Best student: {best_student.name} {best_student.score}")
 
-    def generate_all(self) -> None:
+    def __generate_all__(self) -> None:
+        """Печать всех студентов"""
         students = self.studentStorage.get_all_students()
         for student in students:
             print(f"Student: {student.name} {student.score}")
 
-    def generate_average_score(self) -> None:
+    def __generate_average_score__(self) -> None:
+        """Печать средней оценки всех студентов"""
         print(f"Average score: {self.studentStatistics.get_average_score()}")
+
+    def print_report(self) -> None:
+        """Печать отчета"""
+        self.__generate_all__()
+        self.__generate_best__()
+        self.__generate_average_score__()
 
 # пример использования
 studentStorage = StudentStorage()
 studentStatistics = StudentStatistics(studentStorage)
-studentReportService = StudentReportService(studentStatistics, studentStorage)
+studentReportPrinter = StudentReportPrinter(studentStatistics, studentStorage)
 
 studentStorage.add_student(
     Student(
@@ -109,6 +115,4 @@ studentStorage.add_student(
     )
 )
 
-studentReportService.generate_all()
-studentReportService.generate_best()
-studentReportService.generate_average_score()
+studentReportPrinter.print_report()
