@@ -38,7 +38,7 @@ class JournalService:
         NB!: can throw Exception
         """
         student = self.repo.find__student(student_name)
-        lesson = self.repo.find_lesson(lesson_name)
+        lesson = self.repo.find__lesson(lesson_name)
 
         if student is None or lesson is None:
             raise ValueError(f"Студент или урок не найден")

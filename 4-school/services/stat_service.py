@@ -24,9 +24,9 @@ class ScoreStatistics(IStatisticsService):
     journalRepo: IJournalRepository 
 
     def __calc_average_score_by_student__(self, student: Student) -> float:
-        scores = self.journalRepo.get_student_scores()
+        scores = self.journalRepo.get_student_scores(student)
         lessons_count = self.journalRepo.get_lessons_count()
-        return scores / lessons_count
+        return sum(scores.values()) / lessons_count
 
     def __calc_average_score_by_lesson__(self, lesson: Lesson) -> float:
         students = self.journalRepo.get_students()

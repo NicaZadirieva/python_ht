@@ -1,4 +1,4 @@
-﻿from dataclasses import dataclass
+﻿from dataclasses import Field, dataclass, field
 from abc import ABC, abstractmethod
 from typing import Dict
 from models.student_model import Student
@@ -71,13 +71,14 @@ class IJournalRepository(ABC):
         """
         pass
 
+@dataclass
 class InMemoryJournalRepo(IJournalRepository):
     """
     Работа с журналом в памяти
     """
-    _students: list[Student]
-    _lessons: list[Lesson]
-    _scores: Dict[Student, Dict[Lesson, float]]
+    _students: list[Student] = field(default_factory=list)
+    _lessons: list[Lesson] = field(default_factory=list)
+    _scores: Dict[Student, Dict[Lesson, float]] = field(default_factory=dict)
 
     def add_student(self, student: Student):
         self._students.append(student)
