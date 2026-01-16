@@ -57,6 +57,20 @@ class IJournalRepository(ABC):
         """
         pass
 
+    @abstractmethod
+    def get_students(self) -> list[Student]:
+        """
+        Получение всех студентов
+        """
+        pass
+
+    @abstractmethod
+    def get_lessons(self) -> list[Lesson]:
+        """
+        Получение всех уроков
+        """
+        pass
+
 class InMemoryJournalRepo(IJournalRepository):
     """
     Работа с журналом в памяти
@@ -95,3 +109,9 @@ class InMemoryJournalRepo(IJournalRepository):
 
     def get_lessons_count(self):
         return len(self._lessons)
+
+    def get_students(self) -> list[Student]:
+        return self._students
+
+    def get_lessons(self) -> list[Lesson]:
+        return self._lessons
