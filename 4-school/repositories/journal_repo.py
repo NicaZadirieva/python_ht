@@ -1,7 +1,8 @@
 ﻿from dataclasses import dataclass
 from abc import ABC, abstractmethod
 from typing import Dict
-from models import Student, Lesson
+from models.student_model import Student
+from models.lesson_model import Lesson
 
 class IJournalRepository(ABC):
     """
@@ -25,11 +26,36 @@ class IJournalRepository(ABC):
     def add_student_score(self, student: Student, lesson: Lesson, score: float) -> float:
         """
         Добавление оценки студента по предмету
-        NB!: can throw Exception
         """
         pass
 
+    @abstractmethod
+    def get_student_scores(self, student: Student) -> Dict[Lesson, float]:
+        """
+        Получение оценок студента
+        """
+        pass
 
+    @abstractmethod
+    def find__student(self, student_name: str) -> Student:
+        """
+        Поиск студента по имени
+        """
+        pass
+
+    @abstractmethod
+    def find__lesson(self, lesson_name: str) -> Lesson:
+        """
+        Поиск урока по имени
+        """
+        pass
+
+    @abstractmethod
+    def get_lessons_count(self) -> int:
+        """
+        Получение количества уроков
+        """
+        pass
 
 class InMemoryJournalRepo(IJournalRepository):
     """
@@ -48,24 +74,24 @@ class InMemoryJournalRepo(IJournalRepository):
         self._lessons.append(lesson)
         return lesson
 
-    def __find__student(self, student_name: str):
+    def add_student_score(self, student: Student, lesson: Lesson, score: float):
+        self._scores[student][lesson] = score
+        return score
+
+    def find__student(self, student_name: str):
         for student in self._students:
             if student.name == student_name:
                 return student
         return None
 
-    def __find__lesson(self, lesson_name: str):
+    def find__lesson(self, lesson_name: str):
         for lesson in self._lessons:
             if lesson.name == lesson_name:
                 return lesson
         return None
 
-    def add_student_score(self, student_name: str, lesson_name: str, score: float):
-        student = self.__find__student(student_name)
-        lesson = self.__find__lesson(lesson_name)
+    def get_student_scores(self, student: Student):
+        return self._scores[student]
 
-        if student is None or lesson is None:
-            raise ValueError(f"Проверьте данные: студент {student.name} или урок {lesson.name} не найдены")
-        else:
-            self._scores[student][lesson] = score
-            return score
+    def get_lessons_count(self):
+        return len(self._lessons)
