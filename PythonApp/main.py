@@ -1,13 +1,13 @@
-﻿from typing import TypeVar
+﻿from typing import TypeVar, Callable
 
 T = TypeVar("T")
+R = TypeVar("R")
 
-def first_item(items: list[T]) -> T:
-    return items[0]
+def process_items(items: list[T], transformer: Callable[[T], R]):
+    return [transformer(item) for item in items]
 
+def to_upper(s: str) -> str:
+    return s.upper()
 
-users = ["Anton", "Vasya"]
-num = [1, 2, 3]
-
-res = first_item(users)
+result = process_items(["Anton", "Vasya"], to_upper)
     
