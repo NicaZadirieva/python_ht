@@ -1,10 +1,15 @@
-﻿from typing import Generic, TypeVar
+﻿from dataclasses import dataclass
+from typing import Protocol, TypeVar, Generic
 
-Number = TypeVar("Number", int, float)
+class Runnable(Protocol):
+    def run(self) -> None: ...
 
-class MyMath(Generic[Number]):
-    def max(self, a: Number, b: Number):
-        return a if a > b else b
+T = TypeVar("T", bound=Runnable)
 
-    def add(self, a: Number, b: Number):
-        return a + b
+@dataclass
+class TaskRunner(Generic[T]):
+    tasks: list[T]
+
+    def run_all(self) -> None:
+        for task in self.tasks:
+            task.run()
