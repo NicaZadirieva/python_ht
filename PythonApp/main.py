@@ -15,3 +15,15 @@
 Функцию можно использовать для поиска пользователя по ID в списке.
 Если объект не соответствует протоколу Identifiable, выдаётся ошибка.
 """
+from typing import Optional, Protocol, TypeVar
+
+class Identifiable(Protocol):
+    id: int
+
+T = TypeVar("T", bound=Identifiable)
+
+def get_by_id(arr: list[T], id: int) -> Optional[T]:
+    for item in arr:
+        if item.id == id:
+            return item
+    return None
