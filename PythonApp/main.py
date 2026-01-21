@@ -13,16 +13,21 @@
 Типизация: Принимает кортеж (tuple) типов T и R, возвращает кортеж (tuple) типов R и T.
 """
 
-def make_pair(a, b):
+from typing import TypeVar
+
+T = TypeVar("T")
+R = TypeVar("R")
+
+def make_pair(a: T, b: R) -> tuple[T, R]:
     return (a, b)
 
-def get_first(pair: tuple):
+def get_first(pair: tuple[T, R]) -> T:
     return pair[0]
     
-def get_second(pair: tuple):
+def get_second(pair: tuple[T, R]) -> R:
     return pair[1]
 
-def swap_pairs(pair: tuple):
+def swap_pairs(pair: tuple[T, R]) -> tuple[R, T]:
     return (pair[1], pair[0])
 
 
