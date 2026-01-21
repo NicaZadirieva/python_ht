@@ -21,10 +21,10 @@ class Cache(Generic[K, V]):
         self.__cache__[key] = value
 
     def keys(self) -> list[K]:
-        return self.__cache__.keys()
+        return list(self.__cache__.keys())
 
     def values(self) -> list[V]:
-        return self.__cache__.values()
+        return list(self.__cache__.values())
 
 hits = Cache[str, int]()
 hits.set("home", 10)
