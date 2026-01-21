@@ -1,33 +1,10 @@
-﻿"""
-Нужно сделать Repository, который работает с любыми типами и имеет методы:
-- add - добавляет в список элемент
-- get_by_index - получает по index
-- get_all - получает все
+﻿from typing import Generic, TypeVar
 
-Все хранится в list
-"""
+T = TypeVar("T", int, float)
 
-from dataclasses import dataclass
-from typing import Optional, TypeVar, Generic
+class MyMath(Generic[T]):
+    def max(self, a: T, b: T):
+        return a if a > b else b
 
-T = TypeVar("T")
-
-@dataclass
-class Repository(Generic[T]):
-    items: list[T]
-
-    def add(self, item: T) -> T:
-        self.items.append(item)
-        return item
-
-    def get_by_index(self, index: int) -> Optional[T]:
-        return None if index >= len(self.items) else self.items[index] 
-
-    def get_all(self) -> list[T]:
-        return self.items
-
-repo = Repository[int]([1, 2, 3])
-print(repo.add(4))
-
-print(repo.get_by_index(2))
-print(repo.get_all())
+    def add(self, a: T, b: T):
+        return a + b
