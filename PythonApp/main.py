@@ -26,7 +26,7 @@ class Repository(Generic[T]):
     def get_all(self) -> list[T]:
         return self.items
 
-repo = Repository([1, 2, 3])
+repo = Repository[int]([1, 2, 3])
 print(repo.add(4))
 
 print(repo.get_by_index(2))
