@@ -1,10 +1,10 @@
 ﻿from typing import Generic, TypeVar
 
-T = TypeVar("T", int, float)
+Number = TypeVar("Number", int, float)
 
-class MyMath(Generic[T]):
-    def max(self, a: T, b: T):
+class MyMath(Generic[Number]):
+    def max(self, a: Number, b: Number):
         return a if a > b else b
 
-    def add(self, a: T, b: T):
+    def add(self, a: Number, b: Number):
         return a + b
