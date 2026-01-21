@@ -1,13 +1,33 @@
-﻿from typing import TypeVar, Callable
+﻿"""
+Функция make_pair:
+Задача: Принять два значения и создать из них кортеж (tuple).
+Типизация: Используем дженерики T и R для обозначения типов входных значений и кортежа.
+Функция get_first:
+Задача: Извлечь первый элемент из переданного кортежа.
+Типизация: Принимает кортеж (tuple) типов T и R, возвращает тип T.
+Функция get_second:
+Задача: Извлечь второй элемент из переданного кортежа.
+Типизация: Принимает кортеж (tuple) типов T и R, возвращает тип R.
+Функция swap_pairs:
+Задача: Поменять местами элементы в переданном кортеже.
+Типизация: Принимает кортеж (tuple) типов T и R, возвращает кортеж (tuple) типов R и T.
+"""
 
-T = TypeVar("T")
-R = TypeVar("R")
+def make_pair(a, b):
+    return (a, b)
 
-def process_items(items: list[T], transformer: Callable[[T], R]):
-    return [transformer(item) for item in items]
-
-def to_upper(s: str) -> str:
-    return s.upper()
-
-result = process_items(["Anton", "Vasya"], to_upper)
+def get_first(pair: tuple):
+    return pair[0]
     
+def get_second(pair: tuple):
+    return pair[1]
+
+def swap_pairs(pair: tuple):
+    return (pair[1], pair[0])
+
+
+t = make_pair(1, 2)
+print(get_first(t))
+print(get_second(t))
+
+print(swap_pairs(t))
