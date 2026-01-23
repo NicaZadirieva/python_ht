@@ -1,5 +1,4 @@
 ﻿import asyncio
-import requests
 import aiohttp
 
 # получение в задачах конкуретно 10 раз обращение к гугл
