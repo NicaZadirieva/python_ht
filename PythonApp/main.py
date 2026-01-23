@@ -1,12 +1,13 @@
 ﻿import asyncio
 import time
 
-def fetch():
-    time.sleep(2)
+async def fetch():
+    time.sleep(2) # блокирует поток
     return "done"
 
-def main():
-    for _ in range(3):
-        print(fetch())
+async def main():
+    tasks = [fetch() for _ in range(3)]
+    results = await asyncio.gather(*tasks)
+    print(results)
 
-main()
+asyncio.run(main())
