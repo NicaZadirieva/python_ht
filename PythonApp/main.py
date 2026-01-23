@@ -2,7 +2,7 @@
 import time
 
 async def fetch():
-    time.sleep(2) # блокирует поток
+    await asyncio.sleep(2) # блокирует поток
     return "done"
 
 async def main():
