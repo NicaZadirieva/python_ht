@@ -1,19 +1,17 @@
 ﻿import asyncio
 import aiohttp
 
-async def bad():
-    print("Начата")
-    raise ValueError("Error")
+async def job():
+    print("Работаю")
+    await asyncio.sleep(5)
+    print("Готово!")
 
-# получение в задачах конкуретно 10 раз обращение к гугл
+
 async def main():
-    try:
-        task = asyncio.create_task(bad())
-        task.add_done_callback(lambda t: print("Ошибка", t.exception()))
-        await asyncio.sleep(2)
-        print("Ждем")
-        await task
-    except ValueError as e:
-        print(e)
+    task = asyncio.create_task(job())
+    await asyncio.sleep(1)
+    task.cancel()
+    await task
+
 
 asyncio.run(main())
