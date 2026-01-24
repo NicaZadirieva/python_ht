@@ -11,7 +11,12 @@ async def main():
     task = asyncio.create_task(job())
     await asyncio.sleep(1)
     task.cancel()
-    await task
+    try:
+        await task
+    except asyncio.CancelledError:
+        print(task.cancelled())
+        print("Задача отменена")
+
 
 
 asyncio.run(main())
