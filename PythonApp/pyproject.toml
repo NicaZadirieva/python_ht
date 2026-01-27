@@ -1,0 +1,9 @@
+[project]
+name = "note-app"
+version = "0.0.1"
+description = "Проект заметок"
+requires-python = ">=3.10"
+dependencies = ["requests"]
+
+[project.optional-dependencies]
+dev = ["pytest"]
