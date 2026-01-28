@@ -1,0 +1,21 @@
+[project]
+name = "textual_app"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "NicaZadirieva",email = "no.demchenko@yandex.ru"}
+]
+readme = "README.md"
+requires-python = ">=3.13,<4.0"
+dependencies = [
+    "textual (>=7.4.0,<8.0.0)",
+    "httpx (>=0.28.1,<0.29.0)"
+]
+
+
+[tool.poetry.scripts]
+monitoring = "textual_app.entrypoint:run"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
