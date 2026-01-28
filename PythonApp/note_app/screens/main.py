@@ -34,6 +34,7 @@ class MainScreen(Screen):
         Монтирование
         """
         self.title = "Менеджер заметок"
+        self.query_one(MarkdownWidget).text = "## Привет!"
 
     def action_quit(self):
         """

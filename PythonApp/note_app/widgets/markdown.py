@@ -17,3 +17,9 @@ class MarkdownWidget(VerticalScroll):
 
     def compose(self) -> ComposeResult:
         yield Markdown("sdsdsd")
+
+    def watch_text(self, _: str, new_text: str) -> None:
+        """
+        Обновление текста
+        """
+        self.query_one(Markdown).update(new_text)
