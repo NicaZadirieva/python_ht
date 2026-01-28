@@ -4,7 +4,8 @@
 
 from textual.screen import Screen
 from textual.app import ComposeResult
-from textual.widgets import Header, Footer
+from textual.widgets import Header, Footer, Tree, Markdown
+from textual.containers import Horizontal
 
 
 class MainScreen(Screen):
@@ -12,10 +13,18 @@ class MainScreen(Screen):
     Класс для главного экрана
     """
 
+    CSS = """
+    #tree {
+        width: 25%
+    }
+    """
     BINDINGS = [("q", "quit", "Выход")]
 
     def compose(self) -> ComposeResult:
         yield Header()
+        with Horizontal():
+            yield Tree(label="Моя база знаний", id="tree")
+            yield Markdown("# Привет! Я заголовок")
         yield Footer()
 
     def on_mount(self):
