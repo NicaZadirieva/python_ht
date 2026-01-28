@@ -14,3 +14,9 @@ class MainScreen(Screen):
 
     def compose(self) -> ComposeResult:
         yield Header()
+
+    def on_mount(self):
+        """
+        Монтирование
+        """
+        self.title = "Менеджер заметок"
