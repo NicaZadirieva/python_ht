@@ -4,8 +4,10 @@
 
 from textual.screen import Screen
 from textual.app import ComposeResult
-from textual.widgets import Header, Footer, Tree, Markdown
+from textual.widgets import Header, Footer, Tree
 from textual.containers import Horizontal
+
+from note_app.widgets import MarkdownWidget
 
 
 class MainScreen(Screen):
@@ -24,7 +26,7 @@ class MainScreen(Screen):
         yield Header()
         with Horizontal():
             yield Tree(label="Моя база знаний", id="tree")
-            yield Markdown("# Привет! Я заголовок")
+            yield MarkdownWidget()
         yield Footer()
 
     def on_mount(self):
