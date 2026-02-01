@@ -50,3 +50,8 @@ class MainScreen(Screen):
         Выход из приложения
         """
         self.app.exit()
+
+    def on_file_tree_widget_note_selected(
+        self, message: FileTreeWidget.NoteSelected
+    ) -> None:
+        self.notify(message.note_path.__str__())

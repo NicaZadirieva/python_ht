@@ -4,19 +4,25 @@ from textual.app import ComposeResult
 from textual.events import Mount
 from textual.widgets import Tree
 from textual.widgets._tree import TreeNode
-
-from note_app.domain.folder import Folder
+from textual.message import Message
 from note_app.repositories import BaseFolderRepository, BaseNoteRepository
 
 
 class FileTreeWidget(VerticalScroll):
     """
-    Дерево просмотра заметок
+    Дерево просмотра заметок и папок
     """
 
     _tree: Tree
     _folder_repo: BaseFolderRepository
     _note_repo: BaseNoteRepository
+
+    class NoteSelected(Message):
+        """Событие выбора заметок"""
+
+        def __init__(self, note_path: Path):
+            self.note_path = note_path
+            super().__init__()
 
     def __init__(
         self,
@@ -49,4 +55,9 @@ class FileTreeWidget(VerticalScroll):
         notes = self._note_repo.get_notes_by_path(Path(path))
 
         for note in notes:
-            node.add(note.name, note.path)
+            node.add_leaf(note.name, note.path)
+
+    def on_tree_node_selected(self, event: Tree.NodeSelected) -> None:
+        node: TreeNode[Path] = event.node
+        if node.data and node.data.suffix == ".md":
+            self.post_message(self.NoteSelected(node.data))
