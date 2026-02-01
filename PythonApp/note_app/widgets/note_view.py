@@ -8,7 +8,7 @@ from textual.widgets import Markdown
 from textual.reactive import reactive
 
 
-class MarkdownWidget(VerticalScroll):
+class NoteViewWidget(VerticalScroll):
     """
     Виджет для просмотра markdown-файлов
     """

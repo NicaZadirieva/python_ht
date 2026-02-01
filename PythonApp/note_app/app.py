@@ -21,5 +21,5 @@ class NoteManagerApp(App):
         """
         Коллбек после монтирования приложения
         """
-        main_screen = MainScreen()
+        main_screen = MainScreen(self.settings)
         self.push_screen(main_screen)
