@@ -8,8 +8,7 @@ from textual.app import ComposeResult
 from textual.widgets import Header, Footer, Button
 from textual.containers import Horizontal
 
-from textual_app.widgets.MonitoringTable import MonitoringTable
-from textual_app.widgets.TextInput import TextInput
+from textual_app.widgets import MonitoringTable, TextInput
 
 
 class MainScreen(Screen):

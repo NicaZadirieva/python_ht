@@ -4,7 +4,7 @@ UI приложения
 
 from textual.app import App
 
-from textual_app.screens.main import MainScreen
+from textual_app.screens import MainScreen
 
 
 class TextualManagerApp(App):
