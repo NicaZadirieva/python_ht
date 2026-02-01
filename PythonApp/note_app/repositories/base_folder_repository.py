@@ -18,9 +18,9 @@ class BaseFolderRepository(ABC):
         """Получить папки по пути"""
 
     @abstractmethod
-    def create_folder(self, name: str) -> Folder:
+    def create_folder(self, path: Path, name: str) -> Folder:
         """Создать папку"""
 
     @abstractmethod
-    def delete_folder(self, name: str) -> None:
+    def delete_folder(self, folder: Folder) -> None:
         """Удалить папку"""
