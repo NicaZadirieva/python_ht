@@ -4,6 +4,7 @@
 
 from abc import ABC, abstractmethod
 from pathlib import Path
+from typing import Optional
 from note_app.domain import Note
 
 
@@ -29,3 +30,9 @@ class BaseNoteRepository(ABC):
         """
         Удаление заметки
         """
+
+    @abstractmethod
+    def update_note(
+        self, note: Note, content: str, new_name: Optional[str] = None
+    ) -> Note:
+        """Обновление заметки"""

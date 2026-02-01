@@ -3,6 +3,7 @@
 """
 
 from pathlib import Path
+from typing import Optional
 from note_app.domain import Note
 from note_app.repositories.base_note_repository import BaseNoteRepository
 
@@ -53,3 +54,18 @@ class NoteRepository(BaseNoteRepository):
         path = note.path.resolve()
         path = self.__check_path__(path)
         path.unlink()
+
+    def update_note(
+        self, note: Note, content: str, new_name: Optional[str] = None
+    ) -> Note:
+        path = note.path.resolve()
+        path = self.__check_path__(path)
+        path.write_text(content, encoding="utf-8")
+        if new_name and new_name != note.name:
+            if "/" in new_name or "\\" in new_name:
+                raise ValueError("Invalid note name")
+            new_path = path.parent / f"{new_name}.md"
+            path.rename(new_path)
+            return Note(new_name, new_path, content)
+        note.content = content
+        return note
