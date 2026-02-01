@@ -5,7 +5,7 @@
 from textual.events import Mount
 from textual.screen import Screen
 from textual.app import ComposeResult
-from textual.widgets import Header, Footer, Button, Input, Label
+from textual.widgets import Header, Footer, Button, Input, Label, DataTable, Static
 from textual.containers import Horizontal, Vertical
 
 
@@ -41,7 +41,10 @@ class MainScreen(Screen):
                 Input(placeholder="interval..."),
                 classes="form-input",
             ),
-            Button("ADD", classes="button-add"),
+            Button(label="ADD", classes="button-add"),
+        )
+        yield Vertical(
+            Static("Added monitor for https://app.purpleschool.ru"), DataTable()
         )
 
         yield Footer()
@@ -51,6 +54,18 @@ class MainScreen(Screen):
         Монтирование
         """
         self.title = "Менеджер проверки доступа URL"
+        table = self.query_one(DataTable)
+        table.focus()
+        table.add_columns(
+            "url",
+            "interval",
+            "status",
+            "http",
+            "latest checked time",
+        )
+        table.add_row("https://app.purpleschool.ru", 10, "OK", "200", "10:43:09")
+        table.fixed_columns = 5
+        table.cursor_type = "row"
 
     def action_quit(self):
         """
