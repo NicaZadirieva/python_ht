@@ -2,17 +2,19 @@
 Запуск приложения
 """
 
-import asyncio
+from textual_app.app import TextualManagerApp
 
 
-async def main():
+def create_app():
     """
     Точка входа в приложение
     """
+    return TextualManagerApp()
 
 
 def run():
     """
     Функция запуска приложения
     """
-    asyncio.run(main())
+    app = create_app()
+    app.run()
