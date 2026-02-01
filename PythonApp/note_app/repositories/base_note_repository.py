@@ -36,3 +36,9 @@ class BaseNoteRepository(ABC):
         self, note: Note, content: str, new_name: Optional[str] = None
     ) -> Note:
         """Обновление заметки"""
+
+    @abstractmethod
+    def load_note(self, path: Path) -> Note:
+        """
+        Загрузка заметки
+        """

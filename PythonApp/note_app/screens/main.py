@@ -8,6 +8,7 @@ from textual.widgets import Header, Footer
 from textual.containers import Horizontal
 from note_app.config.config import AppSettings
 from note_app.repositories import FolderRepository, NoteRepository
+from note_app.repositories import BaseFolderRepository, BaseNoteRepository
 from note_app.widgets import FileTreeWidget, NoteViewWidget
 
 
@@ -23,17 +24,24 @@ class MainScreen(Screen):
     """
     BINDINGS = [("q", "quit", "Выход")]
 
-    def __init__(self, settings: AppSettings, *args, **kwargs) -> None:
+    def __init__(
+        self,
+        settings: AppSettings,
+        folder_repo: BaseFolderRepository,
+        note_repo: BaseNoteRepository,
+        *args,
+        **kwargs,
+    ) -> None:
+        self._folder_repo = folder_repo
+        self._note_repo = note_repo
         self.settings = settings
         super().__init__(*args, **kwargs)
 
     def compose(self) -> ComposeResult:
-        folder_repo = FolderRepository(self.settings.data_directory)
-        note_repo = NoteRepository(self.settings.data_directory)
         yield Header()
         with Horizontal():
             yield FileTreeWidget(
-                id="tree", folder_repo=folder_repo, note_repo=note_repo
+                id="tree", folder_repo=self._folder_repo, note_repo=self._note_repo
             )
             yield NoteViewWidget()
         yield Footer()
@@ -43,7 +51,6 @@ class MainScreen(Screen):
         Монтирование
         """
         self.title = "Менеджер заметок"
-        self.query_one(NoteViewWidget).text = "## Привет!"
 
     def action_quit(self):
         """
@@ -54,4 +61,8 @@ class MainScreen(Screen):
     def on_file_tree_widget_note_selected(
         self, message: FileTreeWidget.NoteSelected
     ) -> None:
-        self.notify(message.note_path.__str__())
+        note = self._note_repo.load_note(message.note_path)
+        if note.content:
+            self.query_one(NoteViewWidget).text = note.content
+        else:
+            self.query_one(NoteViewWidget).text = ""
