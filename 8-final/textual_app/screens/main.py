@@ -43,6 +43,7 @@ class MainScreen(Screen):
         Монтирование
         """
         self.title = "Менеджер проверки доступа URL"
+        self.query_one(MonitoringTable).current_url = "https://app.purpleschool.ru"
 
     def action_quit(self):
         """
