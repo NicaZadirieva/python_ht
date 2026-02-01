@@ -8,6 +8,8 @@ from textual.app import ComposeResult
 from textual.widgets import Header, Footer, Button, Input, Label, DataTable, Static
 from textual.containers import Horizontal, Vertical
 
+from textual_app.widgets.TextInput import TextInput
+
 
 class MainScreen(Screen):
     """
@@ -15,9 +17,6 @@ class MainScreen(Screen):
     """
 
     CSS = """
-    .form-input {
-        width: 100;
-    }
     .label {
         padding: 1;
     }
@@ -31,16 +30,8 @@ class MainScreen(Screen):
         yield Header()
 
         yield Horizontal(
-            Horizontal(
-                Label("URL", classes="label"),
-                Input(placeholder="URL..."),
-                classes="form-input",
-            ),
-            Horizontal(
-                Label("Interval", classes="label"),
-                Input(placeholder="interval..."),
-                classes="form-input",
-            ),
+            TextInput(label_text="URL", placeholder_text="URL..."),
+            TextInput(label_text="Interval", placeholder_text="interval..."),
             Button(label="ADD", classes="button-add"),
         )
         yield Vertical(
