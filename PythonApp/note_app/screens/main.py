@@ -7,7 +7,7 @@ from textual.app import ComposeResult
 from textual.widgets import Header, Footer
 from textual.containers import Horizontal
 from note_app.config.config import AppSettings
-from note_app.repositories.folder_repository import FolderRepository
+from note_app.repositories import FolderRepository, NoteRepository
 from note_app.widgets import FileTreeWidget, NoteViewWidget
 
 
@@ -29,9 +29,12 @@ class MainScreen(Screen):
 
     def compose(self) -> ComposeResult:
         folder_repo = FolderRepository(self.settings.data_directory)
+        note_repo = NoteRepository(self.settings.data_directory)
         yield Header()
         with Horizontal():
-            yield FileTreeWidget(id="tree", folder_repo=folder_repo)
+            yield FileTreeWidget(
+                id="tree", folder_repo=folder_repo, note_repo=note_repo
+            )
             yield NoteViewWidget()
         yield Footer()
 
