@@ -40,15 +40,16 @@ class NoteRepository(BaseNoteRepository):
                 notes.append(Note(name=sub_path.name, path=sub_path))
         return sorted(notes, key=lambda f: f.name)
 
-    def create_note(self, path: Path, name: str) -> Note:
+    def create_note(self, path: Path, name: str, content: str = "") -> Note:
         path = path.resolve()
         path = self.__check_path__(path)
         if not name or "/" in name or "\\" in name:
             raise ValueError("Invalid note name")
         if name.startswith(".") or path.name.startswith("."):
             raise ValueError("Secret dirs is not allowed")
-        path.mkdir(parents=True, exist_ok=False)
-        return Note(path=path, name=name)
+        new_path = path / f"{name}.md"
+        new_path.write_text(content, encoding="utf-8")
+        return Note(path=path, name=name, content=content)
 
     def delete_note(self, note: Note) -> None:
         path = note.path.resolve()

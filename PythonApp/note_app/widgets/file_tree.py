@@ -24,6 +24,13 @@ class FileTreeWidget(VerticalScroll):
             self.note_path = note_path
             super().__init__()
 
+    class FolderSelected(Message):
+        """Событие выбора папки"""
+
+        def __init__(self, folder_path: Path):
+            self.folder_path = folder_path
+            super().__init__()
+
     def __init__(
         self,
         folder_repo: BaseFolderRepository,
@@ -61,3 +68,8 @@ class FileTreeWidget(VerticalScroll):
         node: TreeNode[Path] = event.node
         if node.data and node.data.suffix == ".md":
             self.post_message(self.NoteSelected(node.data))
+
+    def on_tree_node_highlighted(self, event: Tree.NodeHighlighted) -> None:
+        node: TreeNode[Path] = event.node
+        if node.data and not node.data.suffix == ".md":
+            self.post_message(self.FolderSelected(node.data))

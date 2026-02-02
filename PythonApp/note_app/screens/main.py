@@ -3,6 +3,7 @@
 """
 
 from typing import Optional
+import html2text
 from textual.screen import Screen
 from textual.app import ComposeResult
 from textual.widgets import Header, Footer
@@ -36,6 +37,7 @@ class MainScreen(Screen):
         self._folder_repo = folder_repo
         self._note_repo = note_repo
         self.settings = settings
+        self._dir = settings.data_directory
         super().__init__(*args, **kwargs)
 
     def compose(self) -> ComposeResult:
@@ -63,11 +65,12 @@ class MainScreen(Screen):
         """
         Импорт
         """
-        self.app.push_screen(ImportModal())
+        self.app.push_screen(ImportModal(), self.handle_import)
 
     def handle_import(self, data: Optional[str]):
         if data:
-            self.app.notify(data)
+            md = html2text.html2text(data)
+            self._note_repo.create_note(self._dir, "imported", content=md)
 
     def on_file_tree_widget_note_selected(
         self, message: FileTreeWidget.NoteSelected
@@ -77,3 +80,8 @@ class MainScreen(Screen):
             self.query_one(NoteViewWidget).text = note.content
         else:
             self.query_one(NoteViewWidget).text = ""
+
+    def on_file_tree_widget_folder_selected(
+        self, message: FileTreeWidget.FolderSelected
+    ) -> None:
+        self._dir = message.folder_path
