@@ -1,62 +1,81 @@
 """
-Таблица для просмотра результатов мониторинга
+Виджет таблицы мониторинга
 """
 
-from textual.events import Mount
-from textual.widgets import DataTable, Static
-from textual.app import ComposeResult
-from textual.containers import Vertical
+from typing import Optional, Callable
+from textual.widgets import DataTable
 from textual.reactive import reactive
 
 from textual_app.repositories import BaseMonitorDataRepository
 
 
-class MonitoringTable(Vertical):
+class MonitoringTable(DataTable):
     """
-    Виджет для таблицы просмотра мониторинга
+    Виджет таблицы для отображения данных мониторинга
     """
 
-    current_url: reactive[str] = reactive(default="")
+    current_url = reactive("")
+    last_item_count = 0
 
     def __init__(
-        self, monitor_data_repo: BaseMonitorDataRepository, *args, **kwargs
+        self,
+        monitor_data_repo: BaseMonitorDataRepository,
+        on_data_change: Optional[Callable] = None,
+        *args,
+        **kwargs,
     ) -> None:
         super().__init__(*args, **kwargs)
         self._monitor_data_repo = monitor_data_repo
+        self._on_data_change = on_data_change
+        self._setup_table()
 
-    def compose(self) -> ComposeResult:
-        yield Static("")
-        yield DataTable()
-
-    def _on_mount(self, event: Mount) -> None:
-        table = self.query_one(DataTable)
-        table.focus()
-        table.add_columns(
-            "url",
-            "interval",
-            "status",
-            "http",
-            "latest checked time",
+    def _setup_table(self):
+        """Настройка таблицы"""
+        self.add_columns(
+            "ID",
+            "URL",
+            "Interval",
+            "Status",
+            "HTTP Code",
+            "Last Checked",
+            "Response Time",
         )
-        # table.add_row("https://app.purpleschool.ru", 10, "OK", "200", "10:43:09")
-        table.fixed_columns = 5
-        table.cursor_type = "row"
-
-    def watch_current_url(self, _: str, new_text: str) -> None:
-        """
-        Обновление текста
-        """
-        self.query_one(Static).update(f"Added monitor for {new_text}")
+        self.update_table()
 
     def update_table(self):
-        table = self.query_one(DataTable)
-        table.remove_children()
-        all_data = self._monitor_data_repo.load()
-        for data in all_data:
-            table.add_row(
-                data.url,
-                data.interval,
-                data.status,
-                data.http_code,
-                data.latest_checked_time,
+        """Обновление данных таблицы"""
+        # Очищаем таблицу
+        self.clear()
+
+        # Получаем все элементы из репозитория
+        items = self._monitor_data_repo.load()
+        self.last_item_count = len(items)
+
+        # Добавляем строки
+        for item in items:
+            # Форматируем данные для отображения
+            status = item.status.value if item.status else "PENDING"
+            http_code = str(item.http_code) if item.http_code else ""
+            last_checked = (
+                item.latest_checked_time.strftime("%H:%M:%S")
+                if item.latest_checked_time
+                else "Never"
             )
+            response_time = (
+                f"{item.latest_checked_time:.0f}ms" if item.latest_checked_time else ""
+            )
+
+            # Добавляем строку
+            self.add_row(
+                item.id,
+                item.url,
+                f"{item.interval}s",
+                status,
+                http_code,
+                last_checked,
+                response_time,
+            )
+
+        # Уведомляем об изменении данных
+        if self._on_data_change:
+            self._on_data_change()

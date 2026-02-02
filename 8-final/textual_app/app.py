@@ -29,7 +29,7 @@ class TextualManagerApp(App):
             "./temp.csv"
         )
 
-        monitor_service: MonitorService = MonitorService()
+        monitor_service: MonitorService = MonitorService(monitor_data_repo)
 
         main_screen = MainScreen(
             monitor_data_repo=monitor_data_repo, monitor_service=monitor_service
