@@ -62,6 +62,7 @@ class MainScreen(Screen):
         self._monitor_service = monitor_service
         self._monitoring_started = False
         self._monitor_task: Optional[asyncio.Task] = None
+        self._update_interval = 1  # Интервал обновления в секундах
 
         # Инициализация логгера с записью в файл
         self.logger = self._setup_logger()
@@ -139,19 +140,11 @@ class MainScreen(Screen):
         self.title = "Менеджер проверки доступа URL"
         self.logger.info(f"MainScreen mounted with title: {self.title}")
 
-        # Запускаем периодическое обновление таблицы, но с небольшой задержкой
-        # чтобы дать таблице время смонтироваться
-        self.set_timer(2, lambda: self.set_interval(2, self._refresh_table))
-
-        # Останавливаем мониторинг, если он уже запущен (на случай перезапуска)
-        if (
-            hasattr(self._monitor_service, "_running")
-            and self._monitor_service._running
-        ):
-            self.logger.info("Обнаружен запущенный мониторинг, останавливаем...")
-            self._monitor_service.stop()
-            self._monitoring_started = False
-            self.update_monitor_status(self._monitoring_started)
+        # Запускаем периодическое обновление таблицы
+        self.set_interval(self._update_interval, self._refresh_table)
+        self.logger.debug(
+            f"Set table refresh interval to {self._update_interval} seconds"
+        )
 
         # Проверяем, есть ли уже элементы для мониторинга
         existing_items = self._monitor_data_repo.load()
@@ -164,28 +157,54 @@ class MainScreen(Screen):
                 )
                 self._monitor_service.add(item)
             # Запускаем мониторинг для существующих элементов
-            self._start_monitoring()
-            self._monitoring_started = True
-            self.update_monitor_status(self._monitoring_started)
-            self.logger.info("Started monitoring for existing items")
+            if not self._monitoring_started:
+                self._start_monitoring()
+                self._monitoring_started = True
+                self.update_monitor_status(self._monitoring_started)
+                self.logger.info("Started monitoring for existing items")
+
+    def _get_data_hash(self) -> str:
+        """Создание хэша данных для отслеживания изменений"""
+        try:
+            items = self._monitor_data_repo.load()
+            # Создаем строку с данными, которые могут меняться
+            data_string = ""
+            for item in items:
+                data_string += f"{item.id}:{item.status}:{item.http_code}:{item.latest_checked_time}:{item.response_time}"
+            return str(hash(data_string))
+        except Exception as e:
+            self.logger.error(f"Error calculating data hash: {e}")
+            return ""
 
     def _refresh_table(self):
         """Периодическое обновление таблицы"""
         try:
-            monitor_table = self.query_one("#monitoring_table", MonitoringTable)
-            if monitor_table:
-                # Проверяем, нужно ли обновлять таблицу
+            monitor_table = self.query_one(MonitoringTable)
+            if monitor_table is not None:
+                # Проверяем, изменились ли данные
+                current_hash = self._get_data_hash()
                 current_count = len(self._monitor_data_repo.load())
-                if current_count != monitor_table.last_item_count:
+
+                # Обновляем, если изменилось количество элементов или хэш данных
+                needs_refresh = (
+                    current_count != monitor_table.last_item_count
+                    or current_hash != self._last_data_hash
+                )
+
+                if needs_refresh:
                     self.logger.debug(
-                        f"Table refresh needed: current_count={current_count}, last_item_count={monitor_table.last_item_count}"
+                        f"Table refresh needed: "
+                        f"items_count={current_count}/{monitor_table.last_item_count}, "
+                        f"data_changed={current_hash != self._last_data_hash}"
                     )
                     monitor_table.update_table()
+                    self._last_data_hash = current_hash
+                    self.logger.debug("Table updated with latest data")
+                else:
+                    self.logger.debug("No changes detected, skipping table update")
         except Exception as e:
             # Логируем ошибку, но не падаем
-            self.logger.debug(
-                f"Error refreshing table (may be normal during mount): {e}"
-            )
+            self.logger.debug(f"Error refreshing table: {e}")
 
     def _on_table_data_change(self):
         """Колбэк при изменении данных в таблице"""
