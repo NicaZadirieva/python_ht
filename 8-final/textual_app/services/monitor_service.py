@@ -94,9 +94,13 @@ class MonitorService:
         self._logger.info("Запуск мониторинга")
 
         # Обработка Ctrl+C для graceful shutdown
-        loop = asyncio.get_event_loop()
-        for sig in (signal.SIGINT, signal.SIGTERM):
-            loop.add_signal_handler(sig, self.stop)
+        try:
+            loop = asyncio.get_running_loop()
+            for sig in (signal.SIGINT, signal.SIGTERM):
+                loop.add_signal_handler(sig, self.stop)
+        except (NotImplementedError, RuntimeError):
+            # Не поддерживается на текущей платформе или loop не запущен
+            pass
 
         self._logger.debug("Сигнальные обработчики установлены")
 
@@ -300,7 +304,7 @@ class MonitorService:
             self._logger.debug(f"Завершение проверки URL: {item.url}")
             # После проверки обновляем элемент в репозитории
             if hasattr(self, "_monitor_data_repo"):
-                self._monitor_data_repo.update_item(item)
+                self._monitor_data_repo.update_by_id(item.id, item)
 
             self._logger.info(
                 f"Checked {item.url}: "

@@ -31,15 +31,7 @@ class MonitoringTable(DataTable):
 
     def _setup_table(self):
         """Настройка таблицы"""
-        self.add_columns(
-            "ID",
-            "URL",
-            "Interval",
-            "Status",
-            "HTTP Code",
-            "Last Checked",
-            "Response Time",
-        )
+        self.add_columns("ID", "URL", "Interval", "Status", "HTTP Code", "Last Checked")
         self.update_table()
 
     def update_table(self):
@@ -61,19 +53,10 @@ class MonitoringTable(DataTable):
                 if item.latest_checked_time
                 else "Never"
             )
-            response_time = (
-                f"{item.latest_checked_time:.0f}ms" if item.latest_checked_time else ""
-            )
 
             # Добавляем строку
             self.add_row(
-                item.id,
-                item.url,
-                f"{item.interval}s",
-                status,
-                http_code,
-                last_checked,
-                response_time,
+                item.id, item.url, f"{item.interval}s", status, http_code, last_checked
             )
 
         # Уведомляем об изменении данных
