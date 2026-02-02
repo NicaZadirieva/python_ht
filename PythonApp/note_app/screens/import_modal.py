@@ -2,6 +2,7 @@
 Модальное окно для импорта данных
 """
 
+import httpx
 from textual.screen import ModalScreen
 from textual.containers import Container, Horizontal
 from textual.widgets import Static, Input, Button
@@ -51,11 +52,20 @@ class ImportModal(ModalScreen[str]):
             url_input = self.query_one("#input_url", Input)
             url = url_input.value.strip()
             if url:
-                pass
+                self.app.call_later(self.import_data, url)
             else:
                 url_input.styles.border = ("solid", "red")
         else:
             self.dismiss(None)
 
     async def import_data(self, url: str) -> None:
-        pass
+        try:
+            async with httpx.AsyncClient(timeout=10.0) as client:
+                response = await client.get(url)
+                response.raise_for_status()
+                data = response.text
+                self.dismiss(data)
+        except httpx.HTTPError as http_error:
+            self.app.notify(f"Ошибка загрузки: {http_error}", severity="error")
+        except Exception as error:
+            self.app.notify(f"Неизвестная ошибка: {error}", severity="error")

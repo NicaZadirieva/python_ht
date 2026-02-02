@@ -2,6 +2,7 @@
 Главный экран
 """
 
+from typing import Optional
 from textual.screen import Screen
 from textual.app import ComposeResult
 from textual.widgets import Header, Footer
@@ -64,8 +65,9 @@ class MainScreen(Screen):
         """
         self.app.push_screen(ImportModal())
 
-    def handle_import(self, data):
-        pass
+    def handle_import(self, data: Optional[str]):
+        if data:
+            self.app.notify(data)
 
     def on_file_tree_widget_note_selected(
         self, message: FileTreeWidget.NoteSelected
