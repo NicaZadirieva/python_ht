@@ -63,6 +63,8 @@ class MainScreen(Screen):
         self._monitoring_started = False
         self._monitor_task: Optional[asyncio.Task] = None
         self._update_interval = 1  # Интервал обновления в секундах
+        self._last_data_hash = ""  # Хэш для отслеживания изменений данных
+        self._table_mounted = False  # Флаг, что таблица смонтирована
 
         # Инициализация логгера с записью в файл
         self.logger = self._setup_logger()
@@ -140,11 +142,13 @@ class MainScreen(Screen):
         self.title = "Менеджер проверки доступа URL"
         self.logger.info(f"MainScreen mounted with title: {self.title}")
 
-        # Запускаем периодическое обновление таблицы
-        self.set_interval(self._update_interval, self._refresh_table)
-        self.logger.debug(
-            f"Set table refresh interval to {self._update_interval} seconds"
-        )
+        # Устанавливаем флаг, что таблица смонтирована через небольшую задержку
+        self.set_timer(0.5, self._set_table_mounted)
+
+        # Запускаем периодическое обновление таблицы с задержкой
+        self.set_timer(1.0, self._start_table_refresh)
+
+        self.logger.debug("Table refresh scheduled")
 
         # Проверяем, есть ли уже элементы для мониторинга
         existing_items = self._monitor_data_repo.load()
@@ -163,6 +167,20 @@ class MainScreen(Screen):
                 self.update_monitor_status(self._monitoring_started)
                 self.logger.info("Started monitoring for existing items")
 
+    def _set_table_mounted(self):
+        """Устанавливаем флаг, что таблица смонтирована"""
+        self._table_mounted = True
+        self.logger.debug("Table mounted flag set to True")
+        # Принудительно обновляем таблицу после монтирования
+        self._refresh_table()
+
+    def _start_table_refresh(self):
+        """Запуск периодического обновления таблицы"""
+        self.set_interval(self._update_interval, self._refresh_table)
+        self.logger.debug(
+            f"Table refresh interval started: {self._update_interval} seconds"
+        )
+
     def _get_data_hash(self) -> str:
         """Создание хэша данных для отслеживания изменений"""
         try:
@@ -170,7 +188,15 @@ class MainScreen(Screen):
             # Создаем строку с данными, которые могут меняться
             data_string = ""
             for item in items:
-                data_string += f"{item.id}:{item.status}:{item.http_code}:{item.latest_checked_time}:{item.response_time}"
+                status_val = item.status.value if item.status else "None"
+                http_code_val = str(item.http_code) if item.http_code else "None"
+                checked_time = (
+                    str(item.latest_checked_time)
+                    if item.latest_checked_time
+                    else "None"
+                )
+
+                data_string += f"{item.id}:{status_val}:{http_code_val}:{checked_time}"
             return str(hash(data_string))
         except Exception as e:
             self.logger.error(f"Error calculating data hash: {e}")
@@ -178,8 +204,12 @@ class MainScreen(Screen):
 
     def _refresh_table(self):
         """Периодическое обновление таблицы"""
+        if not self._table_mounted:
+            self.logger.debug("Table not mounted yet, skipping refresh")
+            return
+
         try:
-            monitor_table = self.query_one(MonitoringTable)
+            monitor_table = self.query_one("#monitoring_table")
             if monitor_table is not None:
                 # Проверяем, изменились ли данные
                 current_hash = self._get_data_hash()
@@ -201,7 +231,11 @@ class MainScreen(Screen):
                     self._last_data_hash = current_hash
                     self.logger.debug("Table updated with latest data")
                 else:
-                    self.logger.debug("No changes detected, skipping table update")
+                    # Отладочное сообщение можно убрать или оставить на более высоком уровне
+                    pass
+            else:
+                # Таблица существует, но не найдена - это может быть временной проблемой
+                self.logger.debug("MonitoringTable not found in DOM")
         except Exception as e:
             # Логируем ошибку, но не падаем
             self.logger.debug(f"Error refreshing table: {e}")
@@ -343,8 +377,6 @@ class MainScreen(Screen):
             # Обновляем статус
             self._monitoring_started = False
             self.update_monitor_status(self._monitoring_started)
-
-            # Не пытаемся перезапускать автоматически - оставляем пользователю возможность рестарта
 
     def _stop_monitoring(self):
         """Остановка мониторинга"""
