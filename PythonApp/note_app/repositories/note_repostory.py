@@ -53,7 +53,6 @@ class NoteRepository(BaseNoteRepository):
 
     def delete_note(self, note: Note) -> None:
         path = note.path.resolve()
-        path = self.__check_path__(path)
         path.unlink()
 
     def update_note(

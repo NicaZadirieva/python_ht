@@ -9,6 +9,7 @@ from textual.app import ComposeResult
 from textual.widgets import Header, Footer
 from textual.containers import Horizontal
 from note_app.config.config import AppSettings
+from note_app.domain import Note
 from note_app.repositories import BaseFolderRepository, BaseNoteRepository
 from note_app.screens.import_modal import ImportModal
 from note_app.widgets import FileTreeWidget, NoteViewWidget
@@ -24,7 +25,11 @@ class MainScreen(Screen):
         width: 25%
     }
     """
-    BINDINGS = [("q", "quit", "Выход"), ("i", "import", "Импортировать")]
+    BINDINGS = [
+        ("q", "quit", "Выход"),
+        ("i", "import", "Импортировать"),
+        ("d", "delete", "Удалить"),
+    ]
 
     def __init__(
         self,
@@ -38,6 +43,7 @@ class MainScreen(Screen):
         self._note_repo = note_repo
         self.settings = settings
         self._dir = settings.data_directory
+        self._note: Optional[Note] = None
         super().__init__(*args, **kwargs)
 
     def compose(self) -> ComposeResult:
@@ -61,6 +67,14 @@ class MainScreen(Screen):
         """
         self.app.exit()
 
+    def action_delete(self):
+        """
+        Удалить заметку
+        """
+        if self._note:
+            self._note_repo.delete_note(self._note)
+            self.query_one(FileTreeWidget).collapse()
+
     def action_import(self):
         """
         Импорт
@@ -71,11 +85,13 @@ class MainScreen(Screen):
         if data:
             md = html2text.html2text(data)
             self._note_repo.create_note(self._dir, "imported", content=md)
+            self.query_one(FileTreeWidget).collapse()
 
     def on_file_tree_widget_note_selected(
         self, message: FileTreeWidget.NoteSelected
     ) -> None:
         note = self._note_repo.load_note(message.note_path)
+        self._note = note
         if note.content:
             self.query_one(NoteViewWidget).text = note.content
         else:
