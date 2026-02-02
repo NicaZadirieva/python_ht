@@ -7,8 +7,8 @@ from textual.app import ComposeResult
 from textual.widgets import Header, Footer
 from textual.containers import Horizontal
 from note_app.config.config import AppSettings
-from note_app.repositories import FolderRepository, NoteRepository
 from note_app.repositories import BaseFolderRepository, BaseNoteRepository
+from note_app.screens.import_modal import ImportModal
 from note_app.widgets import FileTreeWidget, NoteViewWidget
 
 
@@ -22,7 +22,7 @@ class MainScreen(Screen):
         width: 25%
     }
     """
-    BINDINGS = [("q", "quit", "Выход")]
+    BINDINGS = [("q", "quit", "Выход"), ("i", "import", "Импортировать")]
 
     def __init__(
         self,
@@ -57,6 +57,15 @@ class MainScreen(Screen):
         Выход из приложения
         """
         self.app.exit()
+
+    def action_import(self):
+        """
+        Импорт
+        """
+        self.app.push_screen(ImportModal())
+
+    def handle_import(self, data):
+        pass
 
     def on_file_tree_widget_note_selected(
         self, message: FileTreeWidget.NoteSelected
