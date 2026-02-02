@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional
 
-from textual_app.domain.status import Status
+from textual_app.domain.status import HttpStatus
 
 
 @dataclass
@@ -18,7 +18,7 @@ class MonitorData:
     id: int
     url: str
     interval: int
-    status: Optional[Status]
+    status: Optional[HttpStatus]
     http_code: Optional[int]
     latest_checked_time: Optional[datetime]
 

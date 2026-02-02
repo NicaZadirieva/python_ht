@@ -2,8 +2,15 @@
 Тип статус
 """
 
-from typing import Literal
+from enum import Enum
 
 
-# Статус запроса
-type Status = Literal["OK", "Pending", "Failed"]
+class HttpStatus(Enum):
+    """
+    Перечисление для статуса http-запроса
+    """
+
+    OK = "OK"
+    PENDING = "Pending"
+    FAILED = "Failed"
+    UNKNOWN = "Unknown"
