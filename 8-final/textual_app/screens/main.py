@@ -5,7 +5,7 @@
 from textual.events import Mount
 from textual.screen import Screen
 from textual.app import ComposeResult
-from textual.widgets import Header, Footer, Button, Input
+from textual.widgets import Header, Footer, Button, Input, Static
 from textual.containers import Horizontal
 from textual import work
 
@@ -47,7 +47,8 @@ class MainScreen(Screen):
 
     def compose(self) -> ComposeResult:
         yield Header()
-
+        # Статус бар
+        yield Static("Мониторинг: остановлен", id="monitor_status")
         yield Horizontal(
             TextInput(
                 label_text="URL", placeholder_text="URL...", input_id="input_url"
@@ -130,6 +131,8 @@ class MainScreen(Screen):
                 self._start_monitoring()
                 self._monitoring_started = True
 
+            self.update_monitor_status(self._monitoring_started)
+
         except Exception as e:
             # Обработка ошибок при добавлении
             print(f"Ошибка при добавлении данных мониторинга: {e}")
@@ -170,3 +173,12 @@ class MainScreen(Screen):
                     url_input.styles.border = ("solid", "red")
                 if interval <= 0:
                     interval_input.styles.border = ("solid", "red")
+
+    def update_monitor_status(self, is_running: bool):
+        status_widget = self.query_one("#monitor_status", Static)
+        if is_running:
+            status_widget.update("Мониторинг: запущен ✓")
+            status_widget.styles.color = "green"
+        else:
+            status_widget.update("Мониторинг: остановлен ✗")
+            status_widget.styles.color = "red"
