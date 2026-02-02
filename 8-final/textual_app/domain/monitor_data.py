@@ -18,9 +18,9 @@ class MonitorData:
     id: int
     url: str
     interval: int
-    status: Optional[HttpStatus]
-    http_code: Optional[int]
-    latest_checked_time: Optional[datetime]
+    status: Optional[HttpStatus] = None
+    http_code: Optional[int] = None
+    latest_checked_time: Optional[datetime] = None
 
     def is_after(self, item: "MonitorData") -> bool:
         """

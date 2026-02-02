@@ -3,6 +3,6 @@
 """
 
 from .monitor_data import MonitorData
-from .status import Status
+from .status import HttpStatus
 
-__all__ = ["MonitorData", "Status"]
+__all__ = ["MonitorData", "HttpStatus"]

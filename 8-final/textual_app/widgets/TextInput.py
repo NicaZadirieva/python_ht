@@ -18,11 +18,14 @@ class TextInput(Horizontal):
     }
     """
 
-    def __init__(self, label_text: str, placeholder_text: str, *args, **kwargs) -> None:
+    def __init__(
+        self, label_text: str, placeholder_text: str, input_id: str, *args, **kwargs
+    ) -> None:
         super().__init__(classes="form-input", *args, **kwargs)
         self.label_text = label_text
         self.placeholder_text = placeholder_text
+        self.input_id = input_id
 
     def compose(self) -> ComposeResult:
         yield Label(self.label_text, classes="label")
-        yield Input(placeholder=self.placeholder_text)
+        yield Input(placeholder=self.placeholder_text, id=self.input_id)
