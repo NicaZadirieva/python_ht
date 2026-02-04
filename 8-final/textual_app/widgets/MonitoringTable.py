@@ -40,6 +40,9 @@ class MonitoringTable(DataTable):
         """Настройка таблицы"""
         self.add_columns("ID", "URL", "Interval", "Status", "HTTP Code", "Last Checked")
         self.update_table()
+        # Включаем курсор для навигации
+        self.cursor_type = "row"
+        self.show_cursor = True
 
     def update_table(self):
         """Обновление данных таблицы"""
@@ -70,7 +73,33 @@ class MonitoringTable(DataTable):
         if self._on_data_change:
             self._on_data_change()
 
-    def on_data_table_row_highlighted(self, event: DataTable.RowHighlighted) -> None:
-        row = event.row_key
-        if row.value:
-            self.post_message(self.MonitorRowSelected(int(row.value)))
+    def get_selected_row_id(self) -> Optional[int]:
+        """
+        Получение ID выделенной строки через cursor_row
+        """
+        if self.cursor_row is None:
+            return None
+
+        try:
+            # Получаем данные из выделенной строки
+            row_data = self.get_row_at(self.cursor_row)
+            if row_data and len(row_data) > 0:
+                # Первый элемент в строке - это ID
+                row_id = row_data[0]
+                # Преобразуем в int, если это строка
+                if isinstance(row_id, str):
+                    return int(row_id)
+                return row_id
+        except (ValueError, IndexError, TypeError) as e:
+            self.log.error(f"Error getting selected row ID: {e}")
+
+        return None
+
+    def on_data_table_row_selected(self, event: DataTable.RowSelected) -> None:
+        self.log.info(f"Row selected: {event.row_key}")
+        if event.row_key.value:
+            try:
+                row_id = int(event.row_key.value)
+                self.post_message(self.MonitorRowSelected(row_id))
+            except ValueError:
+                self.log.error(f"Row key is not an integer: {event.row_key.value}")

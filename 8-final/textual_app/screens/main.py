@@ -259,10 +259,39 @@ class MainScreen(Screen):
         Удалить строку из таблицы
         """
         self.logger.info("Delete action triggered")
-        if self._row:
-            self._monitor_data_repo.delete(self._row)
-            self._monitor_service.delete_by_monitor_id(self._row)
-            self._refresh_table()
+
+        # Получаем таблицу
+        monitor_table = self.query_one("#monitoring_table", MonitoringTable)
+
+        if monitor_table is None:
+            self.logger.error("Monitoring table not found")
+            return
+
+        # Получаем ID выделенной строки через новый метод
+        selected_id = monitor_table.get_selected_row_id()
+
+        if selected_id is None:
+            self.logger.warning("No row selected for deletion")
+            self._show_error_message(
+                "Сначала выберите строку для удаления (стрелками или кликом)"
+            )
+            return
+
+        # Удаляем через репозиторий
+        self._monitor_data_repo.delete(selected_id)
+
+        # Удаляем из сервиса мониторинга
+        if hasattr(self._monitor_service, "delete_by_monitor_id"):
+            self._monitor_service.delete_by_monitor_id(selected_id)
+
+        # Обновляем таблицу
+        monitor_table.update_table()
+
+        # Сбрасываем курсор на первую строку после удаления
+        if monitor_table.row_count > 0:
+            monitor_table.move_cursor(row=0)
+
+        self.logger.info(f"Row {selected_id} deleted successfully")
 
     def add_new_monitor_data(self, url: str, interval: int):
         """Добавление новых данных для мониторинга"""
@@ -480,5 +509,6 @@ class MainScreen(Screen):
         self, message: MonitoringTable.MonitorRowSelected
     ) -> None:
         monitor_id = message.row_id
+        self.logger.info(f"Row selected: id={monitor_id}")
         if monitor_id:
             self._row = monitor_id
