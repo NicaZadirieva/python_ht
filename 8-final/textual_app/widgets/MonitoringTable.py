@@ -5,7 +5,7 @@
 from typing import Optional, Callable
 from textual.widgets import DataTable
 from textual.reactive import reactive
-
+from textual.message import Message
 from textual_app.repositories import BaseMonitorDataRepository
 
 
@@ -16,6 +16,13 @@ class MonitoringTable(DataTable):
 
     current_url = reactive("")
     last_item_count = 0
+
+    class MonitorRowSelected(Message):
+        """Событие выбора заметок"""
+
+        def __init__(self, row_id: int):
+            self.row_id = row_id
+            super().__init__()
 
     def __init__(
         self,
@@ -62,3 +69,8 @@ class MonitoringTable(DataTable):
         # Уведомляем об изменении данных
         if self._on_data_change:
             self._on_data_change()
+
+    def on_data_table_row_highlighted(self, event: DataTable.RowHighlighted) -> None:
+        row = event.row_key
+        if row.value:
+            self.post_message(self.MonitorRowSelected(int(row.value)))

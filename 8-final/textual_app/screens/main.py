@@ -48,7 +48,7 @@ class MainScreen(Screen):
         margin: 1;
     }
     """
-    BINDINGS = [("q", "quit", "Выход")]
+    BINDINGS = [("q", "quit", "Выход"), ("d", "delete", "Удалить")]
 
     def __init__(
         self,
@@ -65,7 +65,7 @@ class MainScreen(Screen):
         self._update_interval = 1  # Интервал обновления в секундах
         self._last_data_hash = ""  # Хэш для отслеживания изменений данных
         self._table_mounted = False  # Флаг, что таблица смонтирована
-
+        self._row: Optional[int] = None
         # Инициализация логгера с записью в файл
         self.logger = self._setup_logger()
 
@@ -253,6 +253,16 @@ class MainScreen(Screen):
         # Останавливаем мониторинг перед выходом
         self._stop_monitoring()
         self.app.exit()
+
+    def action_delete(self):
+        """
+        Удалить строку из таблицы
+        """
+        self.logger.info("Delete action triggered")
+        if self._row:
+            self._monitor_data_repo.delete(self._row)
+            self._monitor_service.delete_by_monitor_id(self._row)
+            self._refresh_table()
 
     def add_new_monitor_data(self, url: str, interval: int):
         """Добавление новых данных для мониторинга"""
@@ -465,3 +475,10 @@ class MainScreen(Screen):
             except:
                 pass
         self.logger.info("MainScreen unmounted")
+
+    def on_monitoring_table_monitor_row_selected(
+        self, message: MonitoringTable.MonitorRowSelected
+    ) -> None:
+        monitor_id = message.row_id
+        if monitor_id:
+            self._row = monitor_id

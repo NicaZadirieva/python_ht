@@ -1,6 +1,7 @@
 from collections import deque
 from dataclasses import dataclass, field
 from datetime import datetime
+from types import CoroutineType
 from typing import Optional
 import asyncio
 import signal
@@ -19,12 +20,31 @@ class MonitorService:
     _monitor_data_repo: BaseMonitorDataRepository
     _last_checked_time: datetime = datetime.now()
     waiting_queue: deque[MonitorData] = field(default_factory=deque)
+    mapping_tasks: dict[int, Optional[CoroutineType]] = field(default_factory=dict)
     _running: bool = True
     _logger: logging.Logger = field(init=False)
     _session: Optional[aiohttp.ClientSession] = None
     _timeout: int = 10  # Таймаут по умолчанию 10 секунд
     _max_retries: int = 3  # Максимальное количество попыток
     _verify_ssl: bool = True  # Проверять SSL сертификаты
+
+    def delete_by_monitor_id(self, monitor_id: int):
+        """
+        Удаление задачи по id-ку строки
+        """
+        task = self.mapping_tasks[monitor_id]
+        if task:
+            try:
+                task.throw(asyncio.CancelledError)
+            except:  # noqa: E722
+                self._logger.info(f"Task for row#{monitor_id} is stopped")
+            self.mapping_tasks[monitor_id] = None
+            monitor_to_delete = None
+            for monitor in self.waiting_queue:
+                if monitor.id == monitor_id:
+                    monitor_to_delete = monitor
+            if monitor_to_delete:
+                self.waiting_queue.remove(monitor_to_delete)
 
     def __post_init__(self):
         """Инициализация логгера после создания экземпляра класса"""
@@ -142,7 +162,12 @@ class MonitorService:
                     self._logger.info(
                         f"Начинаем проверку {len(items_to_check)} элементов"
                     )
-                    tasks = [self._perform_async_check(item) for item in items_to_check]
+                    tasks = []
+                    for item in items_to_check:
+                        task = self._perform_async_check(item)
+                        self.mapping_tasks[item.id] = task
+                        tasks.append(task)
+
                     results = await asyncio.gather(*tasks, return_exceptions=True)
 
                     # Логируем результаты проверки
